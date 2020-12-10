@@ -9,7 +9,8 @@
     - Flip flips everything in the string to the opposite case. 
     Each is outputted to the user. It will ONLY accept letters
     because only LETTERS can be uppercased or lowercased. No other
-    input (like spaces, non-letter characters, etc.) will be accepted. 
+    input (like spaces, non-letter characters, etc.) will be accepted
+    since they cannot be uppercased or lowercased. 
 */
 
 // Header files for program functionality

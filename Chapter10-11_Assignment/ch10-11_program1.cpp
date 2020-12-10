@@ -2,117 +2,140 @@
     Programmer: Anthony Flores-Alvarez
     Course: CS 216 - OOP in C++
     Date: October 10, 2020
-    Description: This program takes an integer representing a day of the year and 
-    translates it to a string consisting of the month followed by using a class.
+    Description: This program dynamically allocates an array large 
+    enough to hold a user-defined number of test scores. Then, the
+    test scores entered are sorted in ascending order & displayed
+    all entered scores are shown, and then the average of the scores 
+    is calculated and shown.
 */
 
 // Header files for program functionality
 #include <iostream>
-#include <string>
+#include <iomanip>
 
 // Allows us to not have to use std:: throughout program
 using namespace std;
 
-// Constant integer for the size of our arrays
-const int NUM_MONTHS = 12;
+// Function to sort array in ascending order
+void ascendingSort(double *testPtr, int numOfTests){
+    // To help in swapping
+    double temp;
 
-// Creating DayOfYear Class
-class DayOfYear{
-    
-    private:
-        const static string monthNames[NUM_MONTHS];
-        const static int maxDaysInMonth[NUM_MONTHS];
- 
-        int day;         // To hold a day
-        int month = 0;   // To hold month num
-        
-    public:
-    
-        // Constructor
-        DayOfYear(int);
-    
-        // Print function that prints the day in the month-day format
-        void print();
-};
+    // Will control when array is done sorting
+    bool stillSwapping = true;
 
-// Definition of const static array member holding month names
-const string DayOfYear::monthNames[] = {"January", "February", "March", "April",
-                                   "May", "June", "July", "August", "September", 
-                                   "October", "November", "December"};
-                                
-// Definition of const static array member holding the maximum day in each month 
-const int DayOfYear::maxDaysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    // While still swapping... 
+    while(stillSwapping){
 
-// Constructor take as parameter an integer representing the day of the year
-DayOfYear::DayOfYear(int userDay){
-            
-            day = userDay;
+        stillSwapping = false;
 
-}
-        
-void DayOfYear::print(){
-            
-            /*
-                Subtracting by the number of days for each month
-                until no more whole months
-            */
-            for (int i = 0; i < 12; i++){
+        // Loops through all test scores
+        for(int counter = 0; counter < numOfTests - 1; counter++){
+
+            // Checks if following score is greater than current score
+            if(*(testPtr+counter) > *(testPtr+counter+1)){
                 
-                // Exiting if there are no more whole months left
-                if (day <= maxDaysInMonth[i])
-                    break;
-                    
-                else{
-                    
-                    // Subtracting number of days of that month
-                    day -= maxDaysInMonth[i];
-                    // Incrementing number of months
-                    month++;
-                }
+                // If so, swap them
+                temp = *(testPtr+counter+1);
+                *(testPtr+counter+1) = *(testPtr+counter);
+                *(testPtr+counter) = temp;
+
+                // Updates the control variable
+                stillSwapping = true;
+
             }
-    
-            // Displaying the month day result
-            cout << monthNames[month] << " " << day;
+
+        } 
+
+    } 
 }
 
-// MAIN Function
+// Function to get the average of the scores
+double calcAverage(double *testPtr, int numOfTests){
+    
+    // Holds total of scores
+    double scoreSum = 0.0;
+
+    // Loops through all test scores
+    for(int counter = 0; counter < numOfTests; counter++){
+        scoreSum += *(testPtr + counter);
+    }
+
+    // Returning the average with double typecast to prevent integer division
+    return (double)scoreSum/numOfTests;
+}
+
+// MAIN FUNCTION
 int main()
 {
+    // Number of tests being entered
+    int numTests;
+
     // Heading
     cout << "-------------------------------------------------" << endl;
-    cout << "Welcome to Day Number to Month-Day Calculator!" << endl;
+    cout << "Welcome to Test Score Sorter and Calculator!" << endl;
     cout << "-------------------------------------------------" << endl;
     cout << "Notes: " << endl;
-    cout << "- Please ensure that all inputs are positive integers within " << endl;
-    cout << "  the range of 1 to 365. No other input will be accepted." << endl;
+    cout << "- Please ensure that all inputs are positive values. " << endl;
     cout << "-------------------------------------------------" << endl;
-
-    // Asking the user for the day number
-    int userDay;
-    cout << "\nPlease enter a day number between 1-365: ";
-    cin >> userDay;
-    
-    // Ensuring that the user enters a valid input
-    while (userDay < 1 || userDay > 365){
+    // Asking for test scores amount
+    cout << "Please enter the number of test scores: ";
+    cin >> numTests;
+    while (numTests < 0 || !cin){
         // Helps in clearing the error flags which are set when cin fails to interpret the input.
         cin.clear();
         // Helps in removing the input contents that could've caused the read failure
         cin.ignore(1000,'\n');
         cout << "Error! Invalid input. Please enter a valid input: ";
-        cin >> userDay;
+        cin >> numTests;
     }
 
-    // Initializing a DayOfYear object with passing of user's number
-    DayOfYear userDaybObj(userDay);
-    
-    // Displaying the corresponding month and day
+    // Dynamically allocate array large enough for number of test scores
+    double *testScores = new double[numTests];
+
+    // OUTPUT
+    cout << "-------------------------------------------------" << endl;
+    cout << "INPUTTED SCORES: \n" << endl;
+    // Store values into array using for loop
+    for(int counter = 0; counter < numTests; counter++){
+        cout << "Test " << counter + 1 << ": ";
+
+        // Using pointer notation
+        cin >> *(testScores + counter);
+
+        // Validating the user input
+        while(*(testScores + counter) < 0 || !cin){
+            // Helps in clearing the error flags which are set when cin fails to interpret the input.
+            cin.clear();
+            // Helps in removing the input contents that could've caused the read failure
+            cin.ignore(1000,'\n');
+            cout << "ERROR! Invalid input. Please enter valid inputs: ";
+            cin >> *(testScores + counter);
+        }
+    }
+    cout << "-------------------------------------------------" << endl;
+    // Sorting the test scores with sort function
+    ascendingSort(testScores, numTests);
+
+    // To ensure output has 2 decimal space formatting
+    cout << fixed << setprecision(1);
+
+    // Output array
+    cout << "Ascending Order of Test Scores: \n";
+    for(int counter = 0; counter < numTests; counter++){
+
+        cout << *(testScores + counter) << " ";
+    }
+    cout << endl;
     cout << "\n-------------------------------------------------" << endl;
-    cout << "Day " << userDay << " would be ";
-    userDaybObj.print();
+
+    // Output Average Score
+    cout << "Average Score: " << calcAverage(testScores, numTests) << endl;
+
     cout << "\n-------------------------------------------------" << endl;
-    cout << "Thank you! : )" << endl;
+    cout << "Thank You!" << endl;
     cout << "-------------------------------------------------" << endl;
 
-    // Terminating the program
+    // Terminating program
     return 0;
 }
